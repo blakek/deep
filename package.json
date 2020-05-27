@@ -1,0 +1,62 @@
+{
+  "name": "deep",
+  "version": "0.0.1",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "browser": "dist/index.umd.js",
+  "author": "GS&F Devs <dev@gsandf.com> (https://gsandf.com/)",
+  "license": "MIT",
+  "files": [
+    "dist/**"
+  ],
+  "sideEffects": false,
+  "types": "dist/index.d.ts",
+  "ava": {
+    "extensions": [
+      "js",
+      "ts"
+    ],
+    "files": [
+      "src/**/*.test.js",
+      "src/**/*.test.ts"
+    ],
+    "ignoredByWatcher": [
+      "!src/**"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-typescript": "^7.9.0",
+    "@rollup/plugin-babel": "^5.0.2",
+    "@rollup/plugin-commonjs": "^12.0.0",
+    "@rollup/plugin-node-resolve": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.23.0",
+    "@typescript-eslint/parser": "^2.23.0",
+    "amper-scripts": "^1.0.0-0",
+    "ava": "^3.5.0",
+    "nodemon": "^2.0.2",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.19.1",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.10.9",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.9.3"
+  },
+  "scripts": {
+    "build": "run-s build:clean build:types build:js",
+    "build:clean": "rimraf ./dist",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:js": "rollup -c",
+    "format-check": "amper-scripts format-check",
+    "format": "amper-scripts format-write",
+    "lint": "amper-scripts lint --config ./.eslintrc.js src",
+    "prepublish": "yarn build",
+    "test": "ava"
+  }
+}
