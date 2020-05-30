@@ -27,7 +27,9 @@
       "ts-node/register"
     ]
   },
-  "dependencies": {},
+  "dependencies": {
+    "pathington": "^1.1.7"
+  },
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
