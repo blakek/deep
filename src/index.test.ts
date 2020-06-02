@@ -1,5 +1,5 @@
 import test from 'ava';
-import { get } from './index';
+import { get, has, set } from './index';
 
 test('get() gets deeply nested values', t => {
   const fixture = {
@@ -62,4 +62,32 @@ test('get() gets deeply nested values', t => {
   function fn() {}
   fn.member = 'member';
   t.is(get(fn, 'member'), 'member');
+});
+
+test('set() sets deeply nested values', t => {
+  t.deepEqual(set({ a: 'abc' }, 'a', 'cba'), { a: 'cba' });
+  t.deepEqual(set({}, 'test', 42), { test: 42 });
+  t.deepEqual(set({}, 'sites.github.username', 'blakek'), {
+    sites: { github: { username: 'blakek' } }
+  });
+});
+
+test('has() returns if the path exists in an object', t => {
+  const fixture = {
+    '': 42,
+    id: 'abf87de',
+    roles: ['alert:create', 'alert:read'],
+    sites: {
+      github: {
+        username: 'blakek'
+      }
+    }
+  };
+
+  t.is(has(fixture, 'id'), true);
+  t.is(has(fixture, 'sites.github'), true);
+  t.is(has(fixture, 'sites.github.username'), true);
+  t.is(has(fixture, 'deeply.nested.nothing'), false);
+  t.is(has(fixture, 'roles[0]'), true);
+  t.is(has(fixture, ''), true);
 });
