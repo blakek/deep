@@ -4,7 +4,26 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "browser": "dist/index.umd.js",
-  "author": "GS&F Devs <dev@gsandf.com> (https://gsandf.com/)",
+  "author": "Blake Knight <oss.ideas@gmail.com> (https://blakek.me/)",
+  "description": "🐡 Get, set, remove, and test for deeply nested properties",
+  "bugs": {
+    "url": "https://github.com/blakek/deep/issues"
+  },
+  "homepage": "https://github.com/blakek/deep",
+  "keywords": [
+    "deep",
+    "get",
+    "getter",
+    "nested",
+    "prop",
+    "properties",
+    "property",
+    "set"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blakek/deep.git"
+  },
   "license": "MIT",
   "files": [
     "dist/**"
