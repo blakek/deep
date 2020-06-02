@@ -73,6 +73,7 @@ test('set() sets deeply nested values', t => {
   t.deepEqual(set({}, 'sites.github.username', 'blakek'), {
     sites: { github: { username: 'blakek' } }
   });
+  t.deepEqual(set({ a: 42 }, 'a.b.c', 123), { a: { b: { c: 123 } } });
 });
 
 test('has() returns if the path exists in an object', t => {
