@@ -45,9 +45,12 @@ test('get() gets deeply nested values', t => {
     get({ falsyValue: null }, 'falsyValue.something', 'fallback'),
     'fallback'
   );
+
+  // Even if the property exists, `get` should return the fallback if the value
+  // is `undefined`
   t.is(
     get({ definedAsUndefined: undefined }, 'definedAsUndefined', 'fallback'),
-    undefined
+    'fallback'
   );
 
   // Properties set to be non-enumerable
@@ -73,7 +76,7 @@ test('set() sets deeply nested values', t => {
 });
 
 test('has() returns if the path exists in an object', t => {
-  const fixture = {
+  const fixture: any = {
     '': 42,
     id: 'abf87de',
     roles: ['alert:create', 'alert:read'],
@@ -81,15 +84,20 @@ test('has() returns if the path exists in an object', t => {
       github: {
         username: 'blakek'
       }
-    }
+    },
+    notDefinedButExists: undefined,
+    nullish: null
   };
 
   t.is(has(fixture, 'id'), true);
   t.is(has(fixture, 'sites.github'), true);
   t.is(has(fixture, 'sites.github.username'), true);
+  t.is(has(fixture, 'nothing'), false);
   t.is(has(fixture, 'deeply.nested.nothing'), false);
   t.is(has(fixture, 'roles[0]'), true);
   t.is(has(fixture, ''), true);
+  t.is(has(fixture, 'notDefinedButExists'), true);
+  t.is(has(fixture, 'nullish'), true);
 });
 
 test('remove() removes a path from an object', t => {

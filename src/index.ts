@@ -38,7 +38,12 @@ export function traverseObject(
 export function get(object: any, path?: Path, defaultValue?: any): any {
   if (path === undefined) return object;
   const value = traverseObject(object, parse(path));
-  return value === NotFound ? defaultValue : value;
+
+  if (value === NotFound || value === undefined) {
+    return defaultValue;
+  }
+
+  return value;
 }
 
 export function has(object: any, path: Path): boolean {
