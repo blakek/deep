@@ -3,6 +3,28 @@ import { isObject } from './is-object';
 
 const NotFound = Symbol('value not found');
 
+export function traverseObject(object: any, path: string[]): any {
+  // If the path has been exhausted, return the current object
+  if (path.length === 0) {
+    return object;
+  }
+
+  // If the value could not be found, return `defaultValue`
+  if (!isObject(object)) {
+    return NotFound;
+  }
+
+  const [key, ...keys] = path;
+
+  // Search deeper in the object
+  if (key in object) {
+    return traverseObject(object[key], keys);
+  }
+
+  // The key was not found in the object.
+  return NotFound;
+}
+
 export function get(object: any, path?: Path, defaultValue?: any): any {
   if (path === undefined) return object;
   const value = traverseObject(object, parse(path));
@@ -54,24 +76,3 @@ export function set(object: any, path: Path, value: any): any {
   return object;
 }
 
-export function traverseObject(object: any, path: string[]): any {
-  // If the path has been exhausted, return the current object
-  if (path.length === 0) {
-    return object;
-  }
-
-  // If the value could not be found, return `defaultValue`
-  if (!isObject(object)) {
-    return NotFound;
-  }
-
-  const [key, ...keys] = path;
-
-  // Search deeper in the object
-  if (key in object) {
-    return traverseObject(object[key], keys);
-  }
-
-  // The key was not found in the object.
-  return NotFound;
-}
