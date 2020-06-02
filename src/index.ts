@@ -41,7 +41,7 @@ export function get(object: any, path?: Path, defaultValue?: any): any {
   return value === NotFound ? defaultValue : value;
 }
 
-export function has(object: any, path: Path): any {
+export function has(object: any, path: Path): boolean {
   const value = traverseObject(object, parse(path));
   return value !== NotFound;
 }
