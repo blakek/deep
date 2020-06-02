@@ -76,3 +76,4 @@ export function set(object: any, path: Path, value: any): any {
   return object;
 }
 
+export { Path };
