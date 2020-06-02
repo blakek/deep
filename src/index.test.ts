@@ -1,5 +1,5 @@
 import test from 'ava';
-import { get, has, set } from './index';
+import { get, has, remove, set } from './index';
 
 test('get() gets deeply nested values', t => {
   const fixture = {
@@ -90,4 +90,27 @@ test('has() returns if the path exists in an object', t => {
   t.is(has(fixture, 'deeply.nested.nothing'), false);
   t.is(has(fixture, 'roles[0]'), true);
   t.is(has(fixture, ''), true);
+});
+
+test('remove() removes a path from an object', t => {
+  t.deepEqual(remove({}, ''), {});
+  t.deepEqual(remove({ username: 'blakek' }, 'username'), {});
+  t.deepEqual(remove({ username: 'blakek' }, 'nothing'), {
+    username: 'blakek'
+  });
+  t.deepEqual(remove({ username: 'blakek' }, 'deep.nothing'), {
+    username: 'blakek'
+  });
+  t.deepEqual(remove({ '': 'abc' }, ''), {});
+  t.deepEqual(
+    remove(
+      {
+        value: [1, 2, { isCool: true }]
+      },
+      'value.2.isCool'
+    ),
+    {
+      value: [1, 2, {}]
+    }
+  );
 });

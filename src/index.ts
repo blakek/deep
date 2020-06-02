@@ -46,6 +46,21 @@ export function has(object: any, path: Path): any {
   return value !== NotFound;
 }
 
+export function remove(object: any, path: Path): any {
+  if (path === undefined) return object;
+  const parsedPath = parse(path);
+
+  const referencePath = parsedPath.slice(0, -1);
+  const finalPath = parsedPath[parsedPath.length - 1];
+  const reference = traverseObject(object, parse(referencePath), false);
+
+  if (!reference) return object;
+
+  delete reference[finalPath];
+
+  return object;
+}
+
 export function set(object: any, path: Path, value: any): any {
   if (path === undefined) return object;
   const parsedPath = parse(path);
