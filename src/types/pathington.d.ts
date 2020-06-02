@@ -1,6 +1,6 @@
 declare module 'pathington';
 
-type Path = Array<number | string> | string;
+export type Path = Array<number | string> | string;
 type QuoteCharacter = '"' | "'" | '`';
 
 export function parse(path: Path): string[];

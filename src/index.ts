@@ -1,7 +1,9 @@
-import { parse, Path } from 'pathington';
+import { parse } from 'pathington';
 import { isObject } from './is-object';
 
 const NotFound = Symbol('value not found');
+
+export type Path = Array<number | string> | string;
 
 export function traverseObject(object: any, path: string[]): any {
   // If the path has been exhausted, return the current object
@@ -75,5 +77,3 @@ export function set(object: any, path: Path, value: any): any {
 
   return object;
 }
-
-export { Path };
