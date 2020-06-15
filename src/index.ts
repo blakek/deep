@@ -1,9 +1,10 @@
+import { curry } from '@blakek/curry';
 import { parse } from 'pathington';
 import { isObject } from './is-object';
 
-const NotFound = Symbol('value not found');
-
 export type Path = Array<number | string> | string;
+
+const NotFound = Symbol('curriable placeholder');
 
 export function traverseObject(object: any, path: string[]): any {
   // If the path has been exhausted, return the current object
@@ -27,8 +28,9 @@ export function traverseObject(object: any, path: string[]): any {
   return NotFound;
 }
 
-export function get(object: any, path?: Path, defaultValue?: any): any {
+function _getOr(defaultValue: any, path: Path, object: any): any {
   if (path === undefined) return object;
+
   const value = traverseObject(object, parse(path));
 
   if (value === NotFound || value === undefined) {
@@ -38,12 +40,14 @@ export function get(object: any, path?: Path, defaultValue?: any): any {
   return value;
 }
 
-export function has(object: any, path: Path): boolean {
+const _get = (path: Path, object: any): any => _getOr(undefined, path, object);
+
+function _has(path: Path, object: any): boolean {
   const value = traverseObject(object, parse(path));
   return value !== NotFound;
 }
 
-export function remove(object: any, path: Path): any {
+function _remove(path: Path, object: any): any {
   if (path === undefined) return object;
   const parsedPath = parse(path);
 
@@ -58,7 +62,7 @@ export function remove(object: any, path: Path): any {
   return object;
 }
 
-export function set(object: any, path: Path, value: any): any {
+function _set(value: any, path: Path, object: any): any {
   const parsedPath = parse(path);
   let reference = object;
 
@@ -77,3 +81,9 @@ export function set(object: any, path: Path, value: any): any {
 
   return object;
 }
+
+export const get = curry(_get);
+export const getOr = curry(_getOr);
+export const has = curry(_has);
+export const remove = curry(_remove);
+export const set = curry(_set);

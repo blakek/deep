@@ -1,5 +1,5 @@
 import test from 'ava';
-import { get, has, remove, set } from './index';
+import { get, getOr, has, remove, set } from './index';
 
 test('get() gets deeply nested values', t => {
   const fixture = {
@@ -15,43 +15,23 @@ test('get() gets deeply nested values', t => {
   };
 
   // Basic functionality
-  t.is(get(fixture, 'id'), 'abf87de');
-  t.is(get(fixture, 'id', 'fallback'), 'abf87de');
-  t.is(get(fixture, 'roles'), fixture.roles, 'expected reference to original');
-  t.is(get(fixture, 'badKey'), undefined);
-  t.is(get(fixture, 'badKeyWithDefault', 42), 42);
-  t.is(get(fixture, ''), 42);
+  t.is(get('id', fixture), 'abf87de');
+  t.is(get('id')(fixture), 'abf87de');
+  t.is(get('roles', fixture), fixture.roles, 'expected reference to original');
+  t.is(get('badKey', fixture), undefined);
+  t.is(get('', fixture), 42);
 
   // Deeply nested object properties
-  t.is(get(fixture, 'sites.github.username'), 'blakek');
-  t.is(get(fixture, 'sites.nothing.username'), undefined);
-  t.is(get(fixture, 'sites.nothing.username', false), false);
+  t.is(get('sites.github.username', fixture), 'blakek');
+  t.is(get('sites.nothing.username', fixture), undefined);
 
   // Deeply nested array properties
-  t.is(get(fixture, 'roles[0]'), 'alert:create');
-  t.is(get(fixture, 'roles[1]', false), 'alert:read');
-  t.is(get(fixture, 'roles.1'), 'alert:read');
-  t.is(get(fixture, 'roles[3]', 'fallback'), 'fallback');
-  t.is(get(fixture, 'roles.3', 'fallback'), 'fallback');
-  t.is(get(fixture, 'roles.stillnotthere', 'fallback'), 'fallback');
+  t.is(get('roles[0]', fixture), 'alert:create');
+  t.is(get('roles.1', fixture), 'alert:read');
 
   // Special characters
-  t.is(get({ 'with.dot': true }, '"with.dot"'), true);
-  t.is(get({ 'with space': 'yep' }, '"with space"'), 'yep');
-
-  // Falsy values
-  t.is(get({ falsyValue: null }, 'falsyValue', 'fallback'), null);
-  t.is(
-    get({ falsyValue: null }, 'falsyValue.something', 'fallback'),
-    'fallback'
-  );
-
-  // Even if the property exists, `get` should return the fallback if the value
-  // is `undefined`
-  t.is(
-    get({ definedAsUndefined: undefined }, 'definedAsUndefined', 'fallback'),
-    'fallback'
-  );
+  t.is(get('"with.dot"', { 'with.dot': true }), true);
+  t.is(get('"with space"', { 'with space': 'yep' }), 'yep');
 
   // Properties set to be non-enumerable
   const withNonEnumerableProp = {};
@@ -59,21 +39,65 @@ test('get() gets deeply nested values', t => {
     value: true,
     enumerable: false
   });
-  t.is(get(withNonEnumerableProp, 'itWorks'), true);
+  t.is(get('itWorks', withNonEnumerableProp), true);
 
   // Properties on functions
   function fn() {}
   fn.member = 'member';
-  t.is(get(fn, 'member'), 'member');
+  t.is(get('member', fn), 'member');
+});
+
+test('getOr() gets deeply nested values with a fallback', t => {
+  const fixture = {
+    // Test edge case of empty-string key
+    '': 42,
+    id: 'abf87de',
+    roles: ['alert:create', 'alert:read'],
+    sites: {
+      github: {
+        username: 'blakek'
+      }
+    }
+  };
+
+  // Basic functionality
+  t.is(getOr('fallback', 'id', fixture), 'abf87de');
+  t.is(getOr('fallback')('id')(fixture), 'abf87de');
+  t.is(getOr(42, 'badKeyWithDefault', fixture), 42);
+
+  // Deeply nested object properties
+  t.is(getOr(false, 'sites.nothing.username', fixture), false);
+  t.is(getOr(false, 'sites.github.username', fixture), 'blakek');
+
+  // Deeply nested array properties
+  t.is(getOr(false)('roles[1]')(fixture), 'alert:read');
+  t.is(getOr('fallback', 'roles.stillnotthere', fixture), 'fallback');
+  t.is(getOr('fallback', 'roles[3]', fixture), 'fallback');
+  t.is(getOr('fallback')('roles.3')(fixture), 'fallback');
+
+  // Falsy values
+  t.is(getOr('fallback', 'falsyValue', { falsyValue: null }), null);
+  t.is(
+    getOr('fallback')('falsyValue.something')({ falsyValue: null }),
+    'fallback'
+  );
+
+  // Even if the property exists, `get` should return the fallback if the value
+  // is `undefined`
+  t.is(
+    getOr('fallback', 'definedAsUndefined', { definedAsUndefined: undefined }),
+    'fallback'
+  );
 });
 
 test('set() sets deeply nested values', t => {
-  t.deepEqual(set({ a: 'abc' }, 'a', 'cba'), { a: 'cba' });
-  t.deepEqual(set({}, 'test', 42), { test: 42 });
-  t.deepEqual(set({}, 'sites.github.username', 'blakek'), {
+  t.deepEqual(set('cba', 'a', { a: 'abc' }), { a: 'cba' });
+  t.deepEqual(set('cba')('a')({ a: 'abc' }), { a: 'cba' });
+  t.deepEqual(set(42, 'test', {}), { test: 42 });
+  t.deepEqual(set('blakek', 'sites.github.username', {}), {
     sites: { github: { username: 'blakek' } }
   });
-  t.deepEqual(set({ a: 42 }, 'a.b.c', 123), { a: { b: { c: 123 } } });
+  t.deepEqual(set(123)('a.b.c')({ a: 42 }), { a: { b: { c: 123 } } });
 });
 
 test('has() returns if the path exists in an object', t => {
@@ -90,36 +114,39 @@ test('has() returns if the path exists in an object', t => {
     nullish: null
   };
 
-  t.is(has(fixture, 'id'), true);
-  t.is(has(fixture, 'sites.github'), true);
-  t.is(has(fixture, 'sites.github.username'), true);
-  t.is(has(fixture, 'nothing'), false);
-  t.is(has(fixture, 'deeply.nested.nothing'), false);
-  t.is(has(fixture, 'roles[0]'), true);
-  t.is(has(fixture, ''), true);
-  t.is(has(fixture, 'notDefinedButExists'), true);
-  t.is(has(fixture, 'nullish'), true);
+  t.is(has('id', fixture), true);
+  t.is(has('id')(fixture), true);
+  t.is(has('sites.github', fixture), true);
+  t.is(has('sites.github.username', fixture), true);
+  t.is(has('nothing')(fixture), false);
+  t.is(has('deeply.nested.nothing', fixture), false);
+  t.is(has('roles[0]')(fixture), true);
+  t.is(has('', fixture), true);
+  t.is(has('notDefinedButExists', fixture), true);
+  t.is(has('nullish', fixture), true);
 });
 
 test('remove() removes a path from an object', t => {
-  t.deepEqual(remove({}, ''), {});
-  t.deepEqual(remove({ username: 'blakek' }, 'username'), {});
-  t.deepEqual(remove({ username: 'blakek' }, 'nothing'), {
+  t.deepEqual(remove('', {}), {});
+  t.deepEqual(remove('')({}), {});
+  t.deepEqual(remove('username', { username: 'blakek' }), {});
+  t.deepEqual(remove('nothing', { username: 'blakek' }), {
     username: 'blakek'
   });
-  t.deepEqual(remove({ username: 'blakek' }, 'deep.nothing'), {
+  t.deepEqual(remove('deep.nothing', { username: 'blakek' }), {
     username: 'blakek'
   });
-  t.deepEqual(remove({ '': 'abc' }, ''), {});
+  t.deepEqual(remove('', { '': 'abc' }), {});
   t.deepEqual(
-    remove(
-      {
-        value: [1, 2, { isCool: true }]
-      },
-      'value.2.isCool'
-    ),
-    {
-      value: [1, 2, {}]
-    }
+    remove('value.2.isCool', {
+      value: [1, 2, { isCool: true }]
+    }),
+    { value: [1, 2, {}] }
+  );
+  t.deepEqual(
+    remove('value.2.isCool')({
+      value: [1, 2, { isCool: true }]
+    }),
+    { value: [1, 2, {}] }
   );
 });

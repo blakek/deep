@@ -25,7 +25,7 @@ $ npm i --save @blakek/deep
 ## Usage
 
 ```js
-import { get, has, remove, set } from '@blakek/deep';
+import { get, getOr, has, remove, set } from '@blakek/deep';
 
 const user = {
   id: 'abf87de',
@@ -38,32 +38,36 @@ const user = {
 };
 
 // Get a property value
-get(user, 'sites.github.username'); // 'blakek'
-get(user, 'this.does.not.exist'); // undefined
-get(user, 'sites.facebook.username', 'no-account'); // 'no-account'
-get(user, 'roles.0'); // 'alert:create'
+get('sites.github.username', user); //» 'blakek'
+
+// Arguments can be partially applied
+const githubUsername = get('sites.github.username');
+githubUsername(user); //» 'blakek'
+
+// Get a property value with a fallback other than `undefined`
+getOr('no-account', 'sites.facebook.username', user); //» 'no-account'
 
 // Test for a property value
-has(user, 'sites.github'); // true
-has(user, 'sites.twitter'); // false
+has('sites.github', user); //» true
 
 // Remove a property value
-remove({ a: 42, b: 123 }, 'a'); // { b: 123 }
-remove({ a: 42 }, 'nothing.exists.here'); // { a: 42 }
+remove('a', { a: 42, b: 123 }); //» { b: 123 }
 
 // Set a property value
-set({ a: 42 }, 'a', 123); // { a: 123 }
-set({ a: 42 }, 'a.b.c', 123); // { a: { b: { c: 123 } } }
+set(123, 'a.b.c', { a: 42 }); //» { a: { b: { c: 123 } } }
 ```
 
 ## API
 
-For all these, `Path` can be a dot-notation string or array of path parts.
+For all these:
+
+- `path` can be either a dot-notation string or array of path parts
+- arguments can be partially applied
 
 ### `get`
 
 ```ts
-function get(object: any, path?: Path, defaultValue?: any): any;
+function get(path: Path, object: any): any;
 ```
 
 Gets the value for a given path with an optional fallback value.
@@ -71,18 +75,55 @@ Gets the value for a given path with an optional fallback value.
 ```js
 const user = {
   id: 'abf87de',
-  roles: ['alert:create', 'alert:read']
+  roles: ['alert:create', 'alert:read'],
+  sites: {
+    github: {
+      username: 'blakek'
+    }
+  }
 };
 
-get(user, 'roles.0'); // 'alert:create'
-get(user, ['roles', 1]); // 'alert:read'
-get(user, 'does.not.exist', 'fallback'); // 'fallback'
+get('id', user); //» 'abf87de'
+get('roles.0', user); //» 'alert:create'
+get('roles[0]', user); //» 'alert:create'
+get(['roles', 1], user); //» 'alert:read'
+get('sites.github.username', user); //» 'blakek'
+
+const getID = get('id');
+getID(user); //» 'abf87de'
+```
+
+### `getOr`
+
+```ts
+function getOr(defaultValue: any, path: Path, object: any): any;
+```
+
+Like `get`, gets a value from an object. Will return a fallback other than
+`undefined` if the value was not found equal to `undefined`.
+
+```js
+const user = {
+  id: 'abf87de',
+  roles: ['alert:create', 'alert:read'],
+  sites: {
+    github: {
+      username: 'blakek'
+    }
+  }
+};
+
+getOr('/images/placeholder.png', 'sites.github.image', user); //» '/images/placeholder.png'
+
+const getRoles = getOr([], 'roles');
+getRoles(user); //» ['alert:create', 'alert:read']
+getRoles({}); //» []
 ```
 
 ### `has`
 
 ```ts
-function has(object: any, path: Path): boolean;
+function has(path: Path, object: any): boolean;
 ```
 
 Returns `true` if a value was found at the given path or `false` if nothing was
@@ -98,19 +139,18 @@ const product = {
   }
 };
 
-has(product, 'attributes.materials'); // true
-has(product, ['avability', 'sizes']); // false
-has(product, 'attributes.isCool'); // true (property exists but is undefined)
+has('attributes.materials', product); //» true
+has(['avability', 'sizes'], product); //» false
+has('attributes.isCool', product); //» true; property exists but is undefined
 
-// `get()` should be used if you want to ensure a value is not `null` or
-// `undefined`
-get(product, 'attributes.isCool', false); // false
+// `get()` should be used if you want to ensure a value is not `undefined`
+getOr(false, 'attributes.isCool', product); //» false
 ```
 
 ### `remove`
 
 ```ts
-function remove(object: any, path: Path): any;
+function remove(path: Path, object: any): any;
 ```
 
 Removes a value at a path and returns the object.
@@ -121,14 +161,15 @@ const user = {
   password: 'wouldntyouliketoknow'
 };
 
-remove(user, 'password'); // { username: 'blakek' }
-remove(user, 'property.does.not.exist'); // { username: 'blakek' }
+remove('password', user); //» { username: 'blakek' }
+remove('property.does.not.exist', user);
+//» { username: 'blakek' } (same object from previous line)
 ```
 
 ### `set`
 
 ```ts
-function set(object: any, path: Path, value: any): any;
+function set(value: any, path: Path, object: any): any;
 ```
 
 Sets a value at a path and returns the object.
@@ -140,12 +181,13 @@ const user = {
   }
 };
 
-set(user, 'profile.bgColor', 'tomato'); // { profile: { bgColor: 'tomato' }
+set('tomato', 'profile.bgColor', user); //» { profile: { bgColor: 'tomato' } }
 
-set(user, 'profile.bgImage', '/images/user.png');
-// { profile: { bgColor: 'tomato', bgImage: '/images/user.png' } }
+set('/images/user.png', 'profile.bgImage', user);
+//» { profile: { bgColor: 'tomato', bgImage: '/images/user.png' } }
 
-set(user, 'profile', null); // { profile: null }
+const logout = set(null, 'profile');
+logout(user); //» { profile: null }
 ```
 
 ## Contributing
