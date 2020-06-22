@@ -62,6 +62,13 @@ function _remove(path: Path, object: any): any {
   return object;
 }
 
+function _pluck(properties: Path[], object: any): any {
+  return properties.reduce(
+    (subset, property) => _set(_get(property, object), property, subset),
+    {}
+  );
+}
+
 function _set(value: any, path: Path, object: any): any {
   const parsedPath = parse(path);
   let reference = object;
@@ -85,5 +92,6 @@ function _set(value: any, path: Path, object: any): any {
 export const get = curry(_get);
 export const getOr = curry(_getOr);
 export const has = curry(_has);
+export const pluck = curry(_pluck);
 export const remove = curry(_remove);
 export const set = curry(_set);

@@ -25,7 +25,7 @@ $ npm i --save @blakek/deep
 ## Usage
 
 ```js
-import { get, getOr, has, remove, set } from '@blakek/deep';
+import { get, getOr, has, pluck remove, set } from '@blakek/deep';
 
 const user = {
   id: 'abf87de',
@@ -49,6 +49,10 @@ getOr('no-account', 'sites.facebook.username', user); //» 'no-account'
 
 // Test for a property value
 has('sites.github', user); //» true
+
+// Pluck a subset of properties
+pluck(['id', 'roles'], user);
+//» { id: 'abf87de', roles: [ 'alert:create', 'alert:read' ] }
 
 // Remove a property value
 remove('a', { a: 42, b: 123 }); //» { b: 123 }
@@ -164,6 +168,30 @@ const user = {
 remove('password', user); //» { username: 'blakek' }
 remove('property.does.not.exist', user);
 //» { username: 'blakek' } (same object from previous line)
+```
+
+### `pluck`
+
+```ts
+function pluck(properties: Path[], object: any): any;
+```
+
+Gets a subset of properties from an object.
+
+```js
+const user = {
+  username: 'blakek',
+  roles: ['alert:create', 'alert:read'],
+  sites: {
+    github: {
+      username: 'blakek'
+    }
+  }
+};
+
+pluck(['username'], user); //» { username: 'blakek' }
+pluck(['username', 'roles'], user);
+//» { username: 'blakek', roles: [ 'alert:create', 'alert:read' ] }
 ```
 
 ### `set`

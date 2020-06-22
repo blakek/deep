@@ -1,5 +1,5 @@
 import test from 'ava';
-import { get, getOr, has, remove, set } from './index';
+import { get, getOr, has, pluck, remove, set } from './index';
 
 test('get() gets deeply nested values', t => {
   const fixture = {
@@ -149,4 +149,33 @@ test('remove() removes a path from an object', t => {
     }),
     { value: [1, 2, {}] }
   );
+});
+
+test('pluck() returns a subset of an object', t => {
+  const fixture = {
+    // Test edge case of empty-string key
+    '': 42,
+    id: 'abf87de',
+    roles: ['alert:create', 'alert:read'],
+    sites: {
+      github: {
+        username: 'blakek'
+      }
+    }
+  };
+
+  t.deepEqual(pluck([], {}), {});
+  t.deepEqual(pluck([])(fixture), {});
+  t.deepEqual(pluck(['id'])(fixture), { id: 'abf87de' });
+  t.deepEqual(pluck(['id', 'roles'], fixture), {
+    id: 'abf87de',
+    roles: ['alert:create', 'alert:read']
+  });
+  t.deepEqual(pluck(['sites.github.username'], fixture), {
+    sites: { github: { username: 'blakek' } }
+  });
+
+  // Should be deeply equal, but return a new object
+  t.deepEqual(pluck(['', 'id', 'roles', 'sites'], fixture), fixture);
+  t.not(pluck(['', 'id', 'roles', 'sites'], fixture), fixture);
 });
