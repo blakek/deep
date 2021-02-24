@@ -86,7 +86,7 @@
     "format-check": "amper-scripts format-check",
     "format": "amper-scripts format-write",
     "lint": "amper-scripts lint --config ./.eslintrc.js 'src/**/*.{js,ts,tsx}'",
-    "prepublish": "yarn build",
+    "prepack": "yarn build",
     "test": "ava"
   }
 }
