@@ -9,8 +9,8 @@ const extensions = ['.js', '.jsx', '.ts', '.tsx'];
 const packageName = /[a-z-]+$/i.exec(pkg.name)[0];
 
 const externals = [
-  ...Object.keys(pkg.dependencies ?? []),
-  ...Object.keys(pkg.peerDependencies ?? [])
+  ...Object.keys(pkg.dependencies || []),
+  ...Object.keys(pkg.peerDependencies || [])
 ];
 
 const commonPlugins = [
