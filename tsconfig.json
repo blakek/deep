@@ -11,11 +11,14 @@
     "noImplicitAny": true,
     "outDir": "dist",
     "sourceMap": true,
-    "target": "ES2020",
-    "paths": {
-      "*": ["node_modules/*"]
-    }
+    "target": "ES2020"
   },
-  "include": ["src/**/*"],
-  "exclude": ["dist/**/*", "**/*.test.ts", "**/*.test.js", "**/testHelpers/**"]
+  "include": ["**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist/**/*",
+    "**/*.test.ts",
+    "**/*.test.js",
+    "**/testHelpers/**"
+  ]
 }
