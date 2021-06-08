@@ -8,31 +8,42 @@ export type WithProperties = ObjectLike | unknown[];
 
 const NotFound = Symbol('curriable placeholder');
 
-function getObjectTypeName(object: unknown): string {
+function getTypeName(object: unknown): string {
+  const typename = typeof object;
+
+  if (typename !== 'object') {
+    return typename;
+  }
+
   return toString.call(object).slice(8, -1).toLowerCase();
 }
 
-const cloneActions = {
-  _: <T>(value: T) => value,
-  array: <T>(value: T) => clone(value),
-  object: <T>(value: T) => clone(value),
-  date: (value: Date) => new Date(value.getTime())
-} as const;
+export function clone<T extends unknown>(value: T): T {
+  const typename = getTypeName(value);
 
-type CloneFn = <T>(value: T) => T;
-type CloneAction = keyof typeof cloneActions;
+  if (
+    typename === 'boolean' ||
+    typename === 'function' ||
+    typename === 'number' ||
+    typename === 'string' ||
+    typename === 'symbol' ||
+    typename === 'undefined'
+  ) {
+    return value;
+  }
 
-export function clone<T extends WithProperties>(object: T): T {
-  const result = (Array.isArray(object) ? [] : {}) as T;
+  if (value instanceof Date) {
+    return new Date((value as Date).getTime()) as T;
+  }
 
-  for (const key in object) {
-    const value = object[key];
-    const typename = getObjectTypeName(value);
+  if (value instanceof RegExp) {
+    return new RegExp(value.source, value.flags) as T;
+  }
 
-    const action = (cloneActions[typename as CloneAction] ??
-      cloneActions._) as CloneFn;
+  const result = (Array.isArray(value) ? [] : {}) as T;
 
-    result[key] = action(value);
+  for (const key in value) {
+    result[key] = clone(value[key]);
   }
 
   return result;

@@ -202,13 +202,18 @@ test('clone() returns a clone of an object', t => {
     val: () => 'works with fn'
   } as const;
   t.deepEqual(clone(withFunction), withFunction);
-  t.not(clone(withFunction).val, withFunction.val);
 
   const withDate = {
-    val: () => new Date()
+    val: new Date()
   } as const;
   t.deepEqual(clone(withDate), withDate);
   t.not(clone(withDate).val, withDate.val);
+
+  const withRegExp = {
+    val: /works/i
+  } as const;
+  t.deepEqual(clone(withRegExp), withRegExp);
+  t.not(clone(withRegExp).val, withRegExp.val);
 });
 
 test('omit() returns a clone of an object with a property removed', t => {
