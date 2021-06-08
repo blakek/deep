@@ -3,8 +3,40 @@ import { parse } from 'pathington';
 import { isObject } from './is-object';
 
 export type Path = Array<number | string> | string;
+export type ObjectLike = Record<keyof unknown, unknown>;
+export type WithProperties = ObjectLike | unknown[];
 
 const NotFound = Symbol('curriable placeholder');
+
+function getObjectTypeName(object: unknown): string {
+  return toString.call(object).slice(8, -1).toLowerCase();
+}
+
+const cloneActions = {
+  _: <T>(value: T) => value,
+  array: <T>(value: T) => clone(value),
+  object: <T>(value: T) => clone(value),
+  date: (value: Date) => new Date(value.getTime())
+} as const;
+
+type CloneFn = <T>(value: T) => T;
+type CloneAction = keyof typeof cloneActions;
+
+export function clone<T extends WithProperties>(object: T): T {
+  const result = (Array.isArray(object) ? [] : {}) as T;
+
+  for (const key in object) {
+    const value = object[key];
+    const typename = getObjectTypeName(value);
+
+    const action = (cloneActions[typename as CloneAction] ??
+      cloneActions._) as CloneFn;
+
+    result[key] = action(value);
+  }
+
+  return result;
+}
 
 export function traverseObject(object: any, path: string[]): any {
   // If the path has been exhausted, return the current object
@@ -62,6 +94,10 @@ function _remove(path: Path, object: any): any {
   return object;
 }
 
+function _omit(path: Path, object: WithProperties): WithProperties {
+  return _remove(path, clone(object));
+}
+
 function _pluck(properties: Path[], object: any): any {
   return properties.reduce(
     (subset, property) => _set(_get(property, object), property, subset),
@@ -92,6 +128,7 @@ function _set(value: any, path: Path, object: any): any {
 export const get = curry(_get);
 export const getOr = curry(_getOr);
 export const has = curry(_has);
+export const omit = curry(_omit);
 export const pluck = curry(_pluck);
 export const remove = curry(_remove);
 export const set = curry(_set);

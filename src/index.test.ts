@@ -1,5 +1,5 @@
 import test from 'ava';
-import { get, getOr, has, pluck, remove, set } from './index';
+import { clone, get, getOr, has, omit, pluck, remove, set } from './index';
 
 test('get() gets deeply nested values', t => {
   const fixture = {
@@ -178,4 +178,49 @@ test('pluck() returns a subset of an object', t => {
   // Should be deeply equal, but return a new object
   t.deepEqual(pluck(['', 'id', 'roles', 'sites'], fixture), fixture);
   t.not(pluck(['', 'id', 'roles', 'sites'], fixture), fixture);
+});
+
+test('clone() returns a clone of an object', t => {
+  t.deepEqual(clone({}), {});
+
+  const o = { value: 42, nested: { again: 'yep' } };
+  t.deepEqual(clone(o), o, 'failed to copy all properties');
+  t.not(clone(o), o, 'returned original instead of copy');
+  t.not(clone(o).nested, o.nested, 'returned original instead of copy');
+
+  const a = [1, 2, [3, 4], { subArray: [true] }] as const;
+  t.deepEqual(clone(a), a, 'failed to deeply copy array');
+  t.not(clone(a), a, 'returned original instead of copy');
+  t.not(clone(a)[2], a[2], 'returned original instead of copy');
+  t.not(
+    clone(a)[3].subArray,
+    a[3].subArray,
+    'returned original instead of copy'
+  );
+
+  const withFunction = {
+    val: () => 'works with fn'
+  } as const;
+  t.deepEqual(clone(withFunction), withFunction);
+  t.not(clone(withFunction).val, withFunction.val);
+
+  const withDate = {
+    val: () => new Date()
+  } as const;
+  t.deepEqual(clone(withDate), withDate);
+  t.not(clone(withDate).val, withDate.val);
+});
+
+test('omit() returns a clone of an object with a property removed', t => {
+  t.deepEqual(omit('', {}), {});
+  t.deepEqual(omit('nothing', {}), {});
+
+  const o = { value: 42, nested: { again: 'yep' } };
+  t.deepEqual(omit('value', o), { nested: { again: 'yep' } });
+  t.deepEqual(omit(['nested'], o), { value: 42 });
+  t.deepEqual(omit(['nested', 'again'], o), { value: 42, nested: {} });
+
+  const a = [1, 2, [3, 4], { subArray: [true] }] as const;
+  t.deepEqual(omit('0', a), [undefined, 2, [3, 4], { subArray: [true] }]);
+  t.deepEqual(omit('3.subArray', a), [1, 2, [3, 4], {}]);
 });
