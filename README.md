@@ -199,6 +199,30 @@ remove('property.does.not.exist', user);
 //» { username: 'blakek' } (same object from previous line)
 ```
 
+### `omit`
+
+Returns a clone of an object with some properties removed.
+
+```ts
+function omit(properties: Path[], object: any): any;
+```
+
+```js
+const user = {
+  username: 'blakek',
+  roles: ['alert:create', 'alert:read'],
+  sites: {
+    github: {
+      username: 'blakek'
+    }
+  }
+};
+
+omit(['roles', 'sites'], user); //» { username: 'blakek' }
+omit(['username', 'roles', 'sites.doesnt.exist'], user);
+//» { sites: { github: { username: 'blakek' } } }
+```
+
 ### `pluck`
 
 Gets a subset of properties from an object.
