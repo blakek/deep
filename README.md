@@ -4,13 +4,6 @@
 
 Helps you safely work with nested properties.
 
-Note: `set()` and `remove()` modify the passed-in object rather than creating a
-copy. If you'd rather return a new object:
-
-- consider using `omit()` instead of `remove()`. `omit()` returns a clone
-- use `clone()` when necessary
-- consider another solution ([unchanged] is really good)
-
 ## Install
 
 Using [Yarn]:
@@ -184,6 +177,9 @@ getOr(false, 'attributes.isCool', product); //» false
 
 Returns a clone of an object with some properties removed.
 
+Note: `omit()` returns a clone with properties removed. If you'd rather modify
+the existing object for performance, consider using `remove()`.
+
 ```ts
 function omit(properties: Path[], object: any): any;
 ```
@@ -232,6 +228,13 @@ pluck(['username', 'roles'], user);
 
 Removes a value at a path and returns the object.
 
+Note: `remove()` modifies the passed-in object rather than creating a copy. If
+you'd rather return a new object:
+
+- use `omit()`; `omit()` returns a clone with a list of properties removed
+- use `clone()` before `remove()`
+- consider another solution ([unchanged] is really good)
+
 ```ts
 function remove(path: Path, object: any): any;
 ```
@@ -250,6 +253,12 @@ remove('property.does.not.exist', user);
 ### `set`
 
 Sets a value at a path and returns the object.
+
+Note: `set()` modifies the passed-in object rather than creating a copy. If
+you'd rather return a new object:
+
+- use `clone()` before `set()`
+- consider another solution ([unchanged] is really good)
 
 ```ts
 function set(value: any, path: Path, object: any): any;
