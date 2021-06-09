@@ -110,8 +110,10 @@ function _remove(path: Path, object: any): any {
   return object;
 }
 
-function _omit(path: Path, object: WithProperties): WithProperties {
-  return _remove(path, clone(object));
+function _omit(properties: Path[], object: WithProperties): WithProperties {
+  const cloned = clone(object);
+  properties.forEach(property => remove(property, cloned));
+  return cloned;
 }
 
 function _pluck(properties: Path[], object: any): any {
