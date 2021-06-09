@@ -8,30 +8,7 @@ export type WithProperties = ObjectLike | unknown[];
 
 const NotFound = Symbol('curriable placeholder');
 
-function getTypeName(object: unknown): string {
-  const typename = typeof object;
-
-  if (typename !== 'object') {
-    return typename;
-  }
-
-  return toString.call(object).slice(8, -1).toLowerCase();
-}
-
 export function clone<T extends unknown>(value: T): T {
-  const typename = getTypeName(value);
-
-  if (
-    typename === 'boolean' ||
-    typename === 'function' ||
-    typename === 'number' ||
-    typename === 'string' ||
-    typename === 'symbol' ||
-    typename === 'undefined'
-  ) {
-    return value;
-  }
-
   if (value instanceof Date) {
     return new Date((value as Date).getTime()) as T;
   }
@@ -40,13 +17,17 @@ export function clone<T extends unknown>(value: T): T {
     return new RegExp(value.source, value.flags) as T;
   }
 
-  const result = (Array.isArray(value) ? [] : {}) as T;
+  if (typeof value === 'object') {
+    const result = (Array.isArray(value) ? [] : {}) as T;
 
-  for (const key in value) {
-    result[key] = clone(value[key]);
+    for (const key in value) {
+      result[key] = clone(value[key]);
+    }
+
+    return result;
   }
 
-  return result;
+  return value;
 }
 
 export function traverseObject(object: any, path: string[]): any {
