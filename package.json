@@ -36,8 +36,7 @@
       "ts"
     ],
     "files": [
-      "src/**/*.test.js",
-      "src/**/*.test.ts"
+      "tests/**/*.test.ts"
     ],
     "ignoredByWatcher": [
       "!src/**"
