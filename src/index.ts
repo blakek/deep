@@ -18,6 +18,10 @@ export function clone<T extends unknown>(value: T): T {
   }
 
   if (typeof value === 'object') {
+    if (value === null) {
+      return null;
+    }
+
     const result = (Array.isArray(value) ? [] : {}) as T;
 
     for (const key in value) {

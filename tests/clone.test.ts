@@ -58,12 +58,12 @@ test('clones regular expressions', t => {
   t.not(clone(withRegExp).value, withRegExp.value);
 });
 
-test.failing('handles null', t => {
+test('handles null', t => {
   t.is(clone(null), null);
 
   t.deepEqual(clone({ a: null }), { a: null });
   t.not(clone({ a: null }), { a: null });
-  t.not(clone({ a: null }.a), null);
+  t.is(clone({ a: null }.a), null);
 });
 
 test.failing('clones Sets', t => {
