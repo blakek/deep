@@ -5,8 +5,11 @@
 Helps you safely work with nested properties.
 
 Note: `set()` and `remove()` modify the passed-in object rather than creating a
-copy. If you'd rather return a new object each time, there are several other
-solutions ([unchanged] is really good).
+copy. If you'd rather return a new object:
+
+- consider using `omit()` instead of `remove()`. `omit()` returns a clone
+- use `clone()` when necessary
+- consider another solution ([unchanged] is really good)
 
 ## Install
 
@@ -25,7 +28,7 @@ $ npm i --save @blakek/deep
 ## Usage
 
 ```js
-import { get, getOr, has, pluck remove, set } from '@blakek/deep';
+import { clone, get, getOr, has, omit, pluck, remove, set } from '@blakek/deep';
 
 const user = {
   id: 'abf87de',
@@ -36,6 +39,13 @@ const user = {
     }
   }
 };
+
+// Deeply clone most values
+const userCopy = clone(user);
+user === userCopy; //» false
+user.id === userCopy.id; //» true
+user.roles === userCopy.roles; //» false
+user.roles[0] === userCopy.roles[0]; //» true
 
 // Get a property value
 get('sites.github.username', user); //» 'blakek'
@@ -50,14 +60,17 @@ getOr('no-account', 'sites.facebook.username', user); //» 'no-account'
 // Test for a property value
 has('sites.github', user); //» true
 
+// Clone an object and omit properties
+omit(['roles', 'sites'], user); //» { id: 'abf87de' }
+
 // Pluck a subset of properties
 pluck(['id', 'roles'], user);
 //» { id: 'abf87de', roles: [ 'alert:create', 'alert:read' ] }
 
-// Remove a property value
+// Remove a property value, modifying the current object
 remove('a', { a: 42, b: 123 }); //» { b: 123 }
 
-// Set a property value
+// Set a property value, modifying the current object
 set(123, 'a.b.c', { a: 42 }); //» { a: { b: { c: 123 } } }
 ```
 
@@ -68,13 +81,29 @@ For all these:
 - `path` can be either a dot-notation string or array of path parts
 - arguments can be partially applied
 
+### `clone`
+
+Returns a deep clone / deep copy of most values: primitive values, objects, arrays, Map, Set, Date, etc.
+
+```ts
+function clone<T extends unknown>(value: T): T;
+```
+
+```js
+const object = { value: 'yep' };
+const cloned = clone(object);
+
+cloned === object; //» false
+cloned.value === object.value; //» true
+```
+
 ### `get`
+
+Gets the value for a given path with an optional fallback value.
 
 ```ts
 function get(path: Path, object: any): any;
 ```
-
-Gets the value for a given path with an optional fallback value.
 
 ```js
 const user = {
@@ -99,12 +128,12 @@ getID(user); //» 'abf87de'
 
 ### `getOr`
 
+Like `get`, gets a value from an object. Will return a fallback other than
+`undefined` if the value was not found equal to `undefined`.
+
 ```ts
 function getOr(defaultValue: any, path: Path, object: any): any;
 ```
-
-Like `get`, gets a value from an object. Will return a fallback other than
-`undefined` if the value was not found equal to `undefined`.
 
 ```js
 const user = {
@@ -126,12 +155,12 @@ getRoles({}); //» []
 
 ### `has`
 
+Returns `true` if a value was found at the given path or `false` if nothing was
+found.
+
 ```ts
 function has(path: Path, object: any): boolean;
 ```
-
-Returns `true` if a value was found at the given path or `false` if nothing was
-found.
 
 ```js
 const product = {
@@ -153,11 +182,11 @@ getOr(false, 'attributes.isCool', product); //» false
 
 ### `remove`
 
+Removes a value at a path and returns the object.
+
 ```ts
 function remove(path: Path, object: any): any;
 ```
-
-Removes a value at a path and returns the object.
 
 ```js
 const user = {
@@ -172,11 +201,11 @@ remove('property.does.not.exist', user);
 
 ### `pluck`
 
+Gets a subset of properties from an object.
+
 ```ts
 function pluck(properties: Path[], object: any): any;
 ```
-
-Gets a subset of properties from an object.
 
 ```js
 const user = {
@@ -196,11 +225,11 @@ pluck(['username', 'roles'], user);
 
 ### `set`
 
+Sets a value at a path and returns the object.
+
 ```ts
 function set(value: any, path: Path, object: any): any;
 ```
-
-Sets a value at a path and returns the object.
 
 ```js
 const user = {
