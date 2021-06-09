@@ -13,8 +13,28 @@ export function clone<T extends unknown>(value: T): T {
     return new Date((value as Date).getTime()) as T;
   }
 
+  if (value instanceof Map) {
+    const result = new Map();
+
+    value.forEach((value, key) => {
+      result.set(key, clone(value));
+    });
+
+    return result as T;
+  }
+
   if (value instanceof RegExp) {
     return new RegExp(value.source, value.flags) as T;
+  }
+
+  if (value instanceof Set) {
+    const result = new Set();
+
+    value.forEach(x => {
+      result.add(clone(x));
+    });
+
+    return result as T;
   }
 
   if (typeof value === 'object') {

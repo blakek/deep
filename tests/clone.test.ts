@@ -66,26 +66,52 @@ test('handles null', t => {
   t.is(clone({ a: null }.a), null);
 });
 
-test.failing('clones Sets', t => {
-  const s = new Set([1, 3, 5]);
-  t.deepEqual(clone(s), s);
-  t.not(clone(s), s);
+test('shallowly clones Sets', t => {
+  const set = new Set([1, 3, 5]);
+  t.deepEqual(clone(set), set);
+  t.not(clone(set), set);
 
-  const withSet = { value: s } as const;
+  const withSet = { value: set } as const;
 
   t.deepEqual(clone(withSet), withSet);
   t.not(clone(withSet).value, withSet.value);
 });
 
-test.failing('clones Maps', t => {
-  const m = new Map([['works', true]]);
-  t.deepEqual(clone(m), m);
-  t.not(clone(m), m);
+test('deeply clones Sets', t => {
+  const nestedSet = new Set([5]);
+  const deepSet = new Set([nestedSet]);
+  const cloned = clone(deepSet);
 
-  const withMap = { value: m } as const;
+  t.deepEqual(cloned, deepSet);
+  t.not(cloned, deepSet);
+
+  for (const value of cloned) {
+    t.not(value, nestedSet);
+  }
+});
+
+test('shallowly clones Maps', t => {
+  const map = new Map([['works', true]]);
+  t.deepEqual(clone(map), map);
+  t.not(clone(map), map);
+
+  const withMap = { value: map } as const;
 
   t.deepEqual(clone(withMap), withMap);
   t.not(clone(withMap).value, withMap.value);
+});
+
+test('deeply clones Maps', t => {
+  const nestedMap = new Map([['works', true]]);
+  const deepMap = new Map([['nested', nestedMap]]);
+  const cloned = clone(deepMap);
+
+  t.deepEqual(cloned, deepMap);
+  t.not(cloned, deepMap);
+
+  for (const value of cloned) {
+    t.not(value[1], nestedMap);
+  }
 });
 
 test('retains functions', t => {
