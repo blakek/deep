@@ -180,25 +180,6 @@ has('attributes.isCool', product); //» true; property exists but is undefined
 getOr(false, 'attributes.isCool', product); //» false
 ```
 
-### `remove`
-
-Removes a value at a path and returns the object.
-
-```ts
-function remove(path: Path, object: any): any;
-```
-
-```js
-const user = {
-  username: 'blakek',
-  password: 'wouldntyouliketoknow'
-};
-
-remove('password', user); //» { username: 'blakek' }
-remove('property.does.not.exist', user);
-//» { username: 'blakek' } (same object from previous line)
-```
-
 ### `omit`
 
 Returns a clone of an object with some properties removed.
@@ -245,6 +226,25 @@ const user = {
 pluck(['username'], user); //» { username: 'blakek' }
 pluck(['username', 'roles'], user);
 //» { username: 'blakek', roles: [ 'alert:create', 'alert:read' ] }
+```
+
+### `remove`
+
+Removes a value at a path and returns the object.
+
+```ts
+function remove(path: Path, object: any): any;
+```
+
+```js
+const user = {
+  username: 'blakek',
+  password: 'wouldntyouliketoknow'
+};
+
+remove('password', user); //» { username: 'blakek' }
+remove('property.does.not.exist', user);
+//» { username: 'blakek' } (same object from previous line)
 ```
 
 ### `set`
