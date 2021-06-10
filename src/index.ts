@@ -128,6 +128,9 @@ function _set(value: any, path: Path, object: any): any {
   let reference = object;
 
   parsedPath.forEach((key, index) => {
+    if (isPrototypePolluted(key))
+      return;
+    
     if (index === parsedPath.length - 1) {
       reference[key] = value;
       return;
@@ -141,6 +144,10 @@ function _set(value: any, path: Path, object: any): any {
   });
 
   return object;
+}
+
+function isPrototypePolluted(key: string) {
+  return ['__proto__', 'constructor', 'prototype'].includes(key);
 }
 
 export const get = curry(_get);
