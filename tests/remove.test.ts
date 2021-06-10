@@ -11,6 +11,9 @@ test('removes a path from an object', t => {
   t.deepEqual(remove('deep.nothing', { username: 'blakek' }), {
     username: 'blakek'
   });
+  t.deepEqual(remove('username.extra', { username: 'blakek' }), {
+    username: 'blakek'
+  });
   t.deepEqual(
     remove('value.2.isCool', {
       value: [1, 2, { isCool: true }]

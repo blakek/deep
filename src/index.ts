@@ -1,12 +1,17 @@
 import { curry } from '@blakek/curry';
 import { parse } from 'pathington';
-import { isObject } from './is-object';
 
-export type Path = Array<number | string> | string;
-export type ObjectLike = Record<keyof unknown, unknown>;
-export type WithProperties = ObjectLike | unknown[];
+export type Path = string | Array<string | number>;
+export type ObjectLike = Record<string | number, any>;
 
 const NotFound = Symbol('curriable placeholder');
+
+export function isObject(object: unknown): object is ObjectLike {
+  if (object === null) return false;
+
+  const type = typeof object;
+  return type === 'object' || type === 'function';
+}
 
 export function clone<T extends unknown>(value: T): T {
   if (value instanceof Date) {
@@ -54,7 +59,7 @@ export function clone<T extends unknown>(value: T): T {
   return value;
 }
 
-export function traverseObject(object: any, path: string[]): any {
+export function traverseObject(object: unknown, path: string[]): unknown {
   // If the path has been exhausted, return the current object
   if (path.length === 0) {
     return object;
@@ -76,7 +81,11 @@ export function traverseObject(object: any, path: string[]): any {
   return NotFound;
 }
 
-function _getOr(defaultValue: any, path: Path, object: any): any {
+function _getOr(
+  defaultValue: unknown,
+  path: Path,
+  object: ObjectLike
+): unknown {
   if (path === undefined) return object;
 
   const value = traverseObject(object, parse(path));
@@ -88,47 +97,52 @@ function _getOr(defaultValue: any, path: Path, object: any): any {
   return value;
 }
 
-const _get = (path: Path, object: any): any => _getOr(undefined, path, object);
+const _get = (path: Path, object: ObjectLike): unknown =>
+  _getOr(undefined, path, object);
 
-function _has(path: Path, object: any): boolean {
+function _has(path: Path, object: ObjectLike): boolean {
   const value = traverseObject(object, parse(path));
   return value !== NotFound;
 }
 
-function _remove(path: Path, object: any): any {
-  if (path === undefined) return object;
-  const parsedPath = parse(path);
+function _remove<T extends ObjectLike>(path: Path, object: T): Partial<T> {
+  if (path === undefined) {
+    return object as T;
+  }
 
+  const parsedPath = parse(path);
   const referencePath = parsedPath.slice(0, -1);
   const finalPath = parsedPath[parsedPath.length - 1];
   const reference = traverseObject(object, parse(referencePath));
 
-  if (!reference) return object;
+  if (isObject(reference)) {
+    delete reference[finalPath];
+  }
 
-  delete reference[finalPath];
-
-  return object;
+  return object as T;
 }
 
-function _omit(properties: Path[], object: WithProperties): WithProperties {
+function _omit(properties: Path[], object: ObjectLike): ObjectLike {
   const cloned = clone(object);
   properties.forEach(property => remove(property, cloned));
   return cloned;
 }
 
-function _pluck(properties: Path[], object: any): any {
+function _pluck(properties: Path[], object: ObjectLike): unknown {
   return properties.reduce(
     (subset, property) => _set(_get(property, object), property, subset),
     {}
   );
 }
 
-function _set(value: any, path: Path, object: any): any {
+function _set(value: unknown, path: Path, object: ObjectLike): ObjectLike {
   const parsedPath = parse(path);
-  let reference = object;
+  let reference: any = object;
 
   parsedPath.forEach((key, index) => {
-    if (index === parsedPath.length - 1) {
+    const isLastElement = index === parsedPath.length - 1;
+
+    if (isLastElement) {
       reference[key] = value;
       return;
     }
