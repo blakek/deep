@@ -107,7 +107,7 @@ function _has(path: Path, object: ObjectLike): boolean {
 
 function _remove<T extends ObjectLike>(path: Path, object: T): Partial<T> {
   if (path === undefined) {
-    return object as T;
+    return object;
   }
 
   const parsedPath = parse(path);
@@ -119,7 +119,7 @@ function _remove<T extends ObjectLike>(path: Path, object: T): Partial<T> {
     delete reference[finalPath];
   }
 
-  return object as T;
+  return object;
 }
 
 function _omit(properties: Path[], object: ObjectLike): ObjectLike {
