@@ -1,15 +1,21 @@
 import { curry } from '@blakek/curry';
 import { parse } from 'pathington';
 
-export type Path = string | Array<string | number>;
-export type ObjectLike = Record<string | number, any>;
+export type ObjectKey = keyof any;
+export type PathPart = ObjectKey;
+export type Path = string | Array<PathPart> | ReadonlyArray<PathPart>;
 
-const NotFound = Symbol('curriable placeholder');
+export type ObjectLike = Record<ObjectKey, any>;
+
+export const NotFound = Symbol('value was not found');
 
 export function isObject(object: unknown): object is ObjectLike {
-  if (object === null) return false;
+  if (object === null) {
+    return false;
+  }
 
   const type = typeof object;
+
   return type === 'object' || type === 'function';
 }
 
