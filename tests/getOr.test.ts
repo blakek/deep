@@ -15,7 +15,6 @@ const fixture = {
 
 test('gets values with a fallback', t => {
   t.is(getOr('fallback', 'id', fixture), 'abf87de');
-  t.is(getOr('fallback')('id')(fixture), 'abf87de');
   t.is(getOr(42, 'badKeyWithDefault', fixture), 42);
 });
 
@@ -25,16 +24,16 @@ test('gets deeply nested object values with a fallback', t => {
 });
 
 test('gets deeply nested array values', t => {
-  t.is(getOr(false)('roles[1]')(fixture), 'alert:read');
+  t.is(getOr(false, 'roles[1]', fixture), 'alert:read');
   t.is(getOr('fallback', 'roles.stillnotthere', fixture), 'fallback');
   t.is(getOr('fallback', 'roles[3]', fixture), 'fallback');
-  t.is(getOr('fallback')('roles.3')(fixture), 'fallback');
+  t.is(getOr('fallback', 'roles.3', fixture), 'fallback');
 });
 
 test('correctly handles falsy values', t => {
   t.is(getOr('fallback', 'falsyValue', { falsyValue: null }), null);
   t.is(
-    getOr('fallback')('falsyValue.something')({ falsyValue: null }),
+    getOr('fallback', 'falsyValue.something', { falsyValue: null }),
     'fallback'
   );
 });

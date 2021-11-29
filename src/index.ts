@@ -1,4 +1,3 @@
-import { curry } from '@blakek/curry';
 import { parse } from 'pathington';
 
 export type ObjectKey = keyof any;
@@ -27,8 +26,8 @@ export function clone<T extends unknown>(value: T): T {
   if (value instanceof Map) {
     const result = new Map();
 
-    value.forEach((value, key) => {
-      result.set(key, clone(value));
+    value.forEach((nestedValue, key) => {
+      result.set(key, clone(nestedValue));
     });
 
     return result as T;
@@ -87,7 +86,7 @@ export function traverseObject(object: unknown, path: string[]): unknown {
   return NotFound;
 }
 
-function _getOr(
+export function getOr(
   defaultValue: unknown,
   path: Path,
   object: ObjectLike
@@ -103,15 +102,16 @@ function _getOr(
   return value;
 }
 
-const _get = (path: Path, object: ObjectLike): unknown =>
-  _getOr(undefined, path, object);
+export function get(path: Path, object: ObjectLike): unknown {
+  return getOr(undefined, path, object);
+}
 
-function _has(path: Path, object: ObjectLike): boolean {
+export function has(path: Path, object: ObjectLike): boolean {
   const value = traverseObject(object, parse(path));
   return value !== NotFound;
 }
 
-function _remove<T extends ObjectLike>(path: Path, object: T): Partial<T> {
+export function remove<T extends ObjectLike>(path: Path, object: T): unknown {
   if (path === undefined) {
     return object;
   }
@@ -128,20 +128,24 @@ function _remove<T extends ObjectLike>(path: Path, object: T): Partial<T> {
   return object;
 }
 
-function _omit(properties: Path[], object: ObjectLike): ObjectLike {
+export function omit(properties: Path[], object: ObjectLike): ObjectLike {
   const cloned = clone(object);
   properties.forEach(property => remove(property, cloned));
   return cloned;
 }
 
-function _pluck(properties: Path[], object: ObjectLike): unknown {
+export function pluck(properties: Path[], object: ObjectLike): unknown {
   return properties.reduce(
-    (subset, property) => _set(_get(property, object), property, subset),
+    (subset, property) => set(get(property, object), property, subset),
     {}
   );
 }
 
-function _set(value: unknown, path: Path, object: ObjectLike): ObjectLike {
+export function set(
+  value: unknown,
+  path: Path,
+  object: ObjectLike
+): ObjectLike {
   const parsedPath = parse(path);
   let reference: any = object;
 
@@ -162,11 +166,3 @@ function _set(value: unknown, path: Path, object: ObjectLike): ObjectLike {
 
   return object;
 }
-
-export const get = curry(_get);
-export const getOr = curry(_getOr);
-export const has = curry(_has);
-export const omit = curry(_omit);
-export const pluck = curry(_pluck);
-export const remove = curry(_remove);
-export const set = curry(_set);

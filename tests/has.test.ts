@@ -16,12 +16,11 @@ const fixture: any = {
 
 test('returns if the path exists in an object', t => {
   t.is(has('id', fixture), true);
-  t.is(has('id')(fixture), true);
   t.is(has('sites.github', fixture), true);
   t.is(has('sites.github.username', fixture), true);
-  t.is(has('nothing')(fixture), false);
+  t.is(has('nothing', fixture), false);
   t.is(has('deeply.nested.nothing', fixture), false);
-  t.is(has('roles[0]')(fixture), true);
+  t.is(has('roles[0]', fixture), true);
   t.is(has('notDefinedButExists', fixture), true);
   t.is(has('nullish', fixture), true);
 });

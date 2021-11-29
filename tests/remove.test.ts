@@ -3,7 +3,6 @@ import { remove } from '../src';
 
 test('removes a path from an object', t => {
   t.deepEqual(remove('', {}), {});
-  t.deepEqual(remove('')({}), {});
   t.deepEqual(remove('username', { username: 'blakek' }), {});
   t.deepEqual(remove('nothing', { username: 'blakek' }), {
     username: 'blakek'
@@ -16,12 +15,6 @@ test('removes a path from an object', t => {
   });
   t.deepEqual(
     remove('value.2.isCool', {
-      value: [1, 2, { isCool: true }]
-    }),
-    { value: [1, 2, {}] }
-  );
-  t.deepEqual(
-    remove('value.2.isCool')({
       value: [1, 2, { isCool: true }]
     }),
     { value: [1, 2, {}] }

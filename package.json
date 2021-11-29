@@ -67,7 +67,6 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "@blakek/curry": "^2.0.2",
     "pathington": "^1.1.7"
   },
   "devDependencies": {
