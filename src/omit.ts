@@ -7,3 +7,9 @@ export function omit(properties: Path[], object: ObjectLike): ObjectLike {
   properties.forEach(property => remove(property, cloned));
   return cloned;
 }
+
+export function createOmit(
+  properties: Path[]
+): (object: ObjectLike) => ObjectLike {
+  return (object: ObjectLike) => omit(properties, object);
+}

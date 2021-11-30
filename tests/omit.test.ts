@@ -1,5 +1,5 @@
 import test from 'ava';
-import { omit } from '../src';
+import { createOmit, omit } from '../src';
 
 test('returns a clone of an object with properties removed', t => {
   t.deepEqual(omit([], {}), {});
@@ -14,4 +14,22 @@ test('returns a clone of an object with properties removed', t => {
   const a = [1, 2, [3, 4], { subArray: [true] }] as const;
   t.deepEqual(omit(['0'], a), [undefined, 2, [3, 4], { subArray: [true] }]);
   t.deepEqual(omit(['3.subArray'], a), [1, 2, [3, 4], {}]);
+});
+
+test('create a reusable omit function', t => {
+  const omitPassword = createOmit(['password', 'dashboard.roles']);
+
+  t.deepEqual(omitPassword({}), {});
+  t.deepEqual(omitPassword({ password: 'test', a: 123 }), { a: 123 });
+  t.deepEqual(
+    omitPassword({
+      password: 'test',
+      dashboard: { name: 'cool', roles: [] },
+      a: 123
+    }),
+    {
+      dashboard: { name: 'cool' },
+      a: 123
+    }
+  );
 });
