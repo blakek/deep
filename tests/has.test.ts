@@ -1,5 +1,5 @@
 import test from 'ava';
-import { has } from '../src';
+import { createHas, has } from '../src';
 
 const fixture: any = {
   '': 42,
@@ -27,4 +27,11 @@ test('returns if the path exists in an object', t => {
 
 test('handles empty-string key', t => {
   t.is(has('', fixture), true);
+});
+
+test('create a reusable has function', t => {
+  const hasUsername = createHas('sites.github.username');
+
+  t.true(hasUsername(fixture));
+  t.false(hasUsername({}));
 });
