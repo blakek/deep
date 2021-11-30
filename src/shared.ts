@@ -18,10 +18,13 @@ export function isObject(object: unknown): object is ObjectLike {
   return type === 'object' || type === 'function';
 }
 
-export function traverseObject(object: unknown, path: string[]): unknown {
+export function traverseObject<Return extends unknown = unknown>(
+  object: unknown,
+  path: string[]
+): Return | typeof NotFound {
   // If the path has been exhausted, return the current object
   if (path.length === 0) {
-    return object;
+    return object as Return;
   }
 
   // If the value could not be found, return `defaultValue`
