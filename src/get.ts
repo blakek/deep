@@ -20,3 +20,11 @@ export function get<
 
   return value;
 }
+
+export function createGet<
+  Return = unknown,
+  FallbackValue extends Return = Return,
+  Input = ObjectLike
+>(path: Path, fallbackValue?: FallbackValue): (object: Input) => Return {
+  return (object: Input) => get(path, object, fallbackValue);
+}

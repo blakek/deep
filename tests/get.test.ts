@@ -1,5 +1,5 @@
 import test from 'ava';
-import { get } from '../src';
+import { createGet, get } from '../src';
 
 const fixture = {
   // Test edge case of empty-string key
@@ -89,4 +89,15 @@ test('returns fallback if the value is undefined', t => {
     get('definedAsUndefined', { definedAsUndefined: undefined }, 'fallback'),
     'fallback'
   );
+});
+
+test('create a reusable get function', t => {
+  const getUsername = createGet<string>('sites.github.username');
+
+  t.is(getUsername(fixture), 'blakek');
+  t.is(getUsername({}), undefined);
+
+  const getNumber = createGet('number', 0);
+  t.is(getNumber({}), 0);
+  t.is(getNumber({ number: 42 }), 42);
 });
