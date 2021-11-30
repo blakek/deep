@@ -16,7 +16,10 @@ const fixture = {
 test('returns a subset of an object', t => {
   t.deepEqual(pluck([], {}), {});
   t.deepEqual(pluck([], fixture), {});
-  t.deepEqual(pluck(['id'], fixture), { id: 'abf87de' });
+
+  const withId = pluck<{ id: string }>(['id'], fixture);
+  t.deepEqual(withId, { id: 'abf87de' });
+
   t.deepEqual(pluck(['id', 'roles'], fixture), {
     id: 'abf87de',
     roles: ['alert:create', 'alert:read']
