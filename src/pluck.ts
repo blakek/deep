@@ -10,3 +10,10 @@ export function pluck<
     {}
   ) as Return;
 }
+
+export function createPluck<
+  Return extends Record<keyof any, any> = Record<keyof any, unknown>,
+  Input extends ObjectLike = ObjectLike
+>(properties: Path[]): (object: Input) => Return {
+  return (object: Input) => pluck(properties, object);
+}
