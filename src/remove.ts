@@ -22,3 +22,9 @@ export function remove<T extends ObjectLike>(path: Path, object: T): unknown {
 
   return object;
 }
+
+export function createRemove<T extends ObjectLike>(
+  path: Path
+): (object: T) => unknown {
+  return (object: T) => remove(path, object);
+}

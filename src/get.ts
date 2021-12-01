@@ -21,7 +21,7 @@ export function get<
   return value;
 }
 
-export function createGet<
+export function createGetter<
   Return = unknown,
   FallbackValue extends Return = Return,
   Input = ObjectLike
