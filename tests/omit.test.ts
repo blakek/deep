@@ -6,6 +6,7 @@ test('returns a clone of an object with properties removed', t => {
   t.deepEqual(omit(['nothing'], {}), {});
 
   const o = { value: 42, nested: { again: 'yep' } };
+
   t.deepEqual(omit(['value'], o), { nested: { again: 'yep' } });
   t.deepEqual(omit(['nested'], o), { value: 42 });
   t.deepEqual(omit([['nested', 'again']], o), { value: 42, nested: {} });
@@ -17,7 +18,10 @@ test('returns a clone of an object with properties removed', t => {
 });
 
 test('create a reusable omit function', t => {
-  const omitPassword = createOmit(['password', 'dashboard.roles']);
+  const omitPassword = createOmit(['password', 'dashboard.roles'] as [
+    'password',
+    'dashboard.roles'
+  ]);
 
   t.deepEqual(omitPassword({}), {});
   t.deepEqual(omitPassword({ password: 'test', a: 123 }), { a: 123 });
