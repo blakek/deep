@@ -1,9 +1,9 @@
 import { parse as parsePath } from 'pathington';
 
-export type PathPart = string | number;
+export type PathPart = keyof any;
 export type Path = string | Array<PathPart> | ReadonlyArray<PathPart>;
 
-export type ObjectKey = string | number;
+export type ObjectKey = keyof any;
 export type ObjectLike = Record<ObjectKey, any>;
 
 export const NotFound = Symbol('value was not found');
