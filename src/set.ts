@@ -3,8 +3,8 @@ import { isObject, ObjectLike, parsePath, Path } from './shared';
 export function set<
   Value = unknown,
   Return extends ObjectLike = unknown,
-  Input extends ObjectLike = Return
->(value: Value, path: Path, object: Input): Return {
+  Object extends ObjectLike = Return
+>(value: Value, path: Path, object: Object): Return {
   const parsedPath = parsePath(path);
   let reference: any = object;
 
@@ -29,7 +29,7 @@ export function set<
 export function createSetter<
   Value = unknown,
   Return extends ObjectLike = unknown,
-  Input extends ObjectLike = Return
->(path: Path, object: Input): (value: Value) => Return {
+  Object extends ObjectLike = Return
+>(path: Path, object: Object): (value: Value) => Return {
   return (value: Value) => set(value, path, object);
 }
