@@ -35,3 +35,16 @@ export type DeepOmit<Object, PropertyPath extends Path> =
         : Object
       : Object
     : Object;
+
+export type DeepOmitPaths<
+  Object,
+  PropertyPaths extends Path[]
+> = PropertyPaths extends []
+  ? Object
+  : PropertyPaths extends [infer First, ...infer Rest]
+  ? First extends Path
+    ? Rest extends Path[]
+      ? DeepOmitPaths<DeepOmit<Object, First>, Rest>
+      : never
+    : never
+  : never;
