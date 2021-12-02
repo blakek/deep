@@ -1,5 +1,5 @@
-import { DeepGet } from './path';
 import {
+  DeepGet,
   NotFound,
   ObjectLike,
   parsePath,
