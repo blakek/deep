@@ -32,6 +32,6 @@ export type DeepOmit<Object, PropertyPath extends Path> =
         ? {
             [Prop in keyof Object]: DeepOmit<Object[Prop], Rest>;
           }
-        : never
-      : never
-    : never;
+        : Object
+      : Object
+    : Object;
