@@ -67,7 +67,8 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "pathington": "^1.1.7"
+    "pathington": "^1.1.7",
+    "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
     "amper-scripts": "^1.2.4",

@@ -14,7 +14,7 @@ const fixture = {
 };
 
 test('gets property values', t => {
-  const id = get<string>('id', fixture);
+  const id = get('id', fixture);
   t.is(id, 'abf87de');
 
   t.is(get('roles', fixture), fixture.roles, 'expected reference to original');
