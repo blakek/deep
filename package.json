@@ -1,6 +1,6 @@
 {
   "name": "@blakek/deep",
-  "version": "4.0.0-0",
+  "version": "4.0.0",
   "description": "🐡 Get, set, remove, and test for deeply nested properties",
   "main": "./dist/index.js",
   "module": "./dist/index.esm.js",
