@@ -28,9 +28,7 @@ export type DeepOmit<Object, PropertyPath extends Path> =
     ? // check if the path's end has been reached
       Rest extends []
       ? Key extends keyof Object
-        ? {
-            [Prop in Exclude<keyof Object, Key>]: DeepOmit<Object[Prop], Rest>;
-          }
+        ? Omit<Object, Key>
         : Object
       : // check the next part of the path
       Rest extends PathPart[]
