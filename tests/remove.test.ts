@@ -13,8 +13,10 @@ test('removes a path from an object', t => {
   t.deepEqual(remove('username.extra', { username: 'blakek' }), {
     username: 'blakek'
   });
+
+  // TODO: fix type for removing from arrays
   t.deepEqual(
-    remove('value.2.isCool', {
+    remove<{ value: (number | Record<string, unknown>)[] }>('value.2.isCool', {
       value: [1, 2, { isCool: true }]
     }),
     { value: [1, 2, {}] }
