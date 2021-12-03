@@ -1,27 +1,43 @@
 {
   "name": "@blakek/deep",
-  "version": "3.0.0",
-  "source": "src/index.ts",
-  "exports": "./dist/index.modern.js",
-  "main": "./dist/index.cjs.js",
-  "module": "./dist/index.esm.js",
-  "unpkg": "./dist/index.umd.js",
-  "browser": "./dist/index.umd.js",
-  "author": "Blake Knight <oss.ideas@gmail.com> (https://blakek.me/)",
+  "version": "4.0.0",
   "description": "🐡 Get, set, remove, and test for deeply nested properties",
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "react-native": "./dist/index.esm.js",
+  "sideEffects": false,
+  "source": "src/index.ts",
+  "types": "./dist/index.d.ts",
+  "author": "Blake Knight <oss.ideas@gmail.com> (https://blakek.me/)",
   "bugs": {
     "url": "https://github.com/blakek/deep/issues"
   },
   "homepage": "https://github.com/blakek/deep",
   "keywords": [
     "deep",
-    "get",
-    "getter",
     "nested",
+    "object",
     "prop",
     "properties",
     "property",
-    "set"
+    "get",
+    "getter",
+    "set",
+    "setter",
+    "path",
+    "clone",
+    "has",
+    "omit",
+    "pluck",
+    "remove"
   ],
   "repository": {
     "type": "git",
@@ -31,11 +47,8 @@
   "files": [
     "dist/**"
   ],
-  "sideEffects": false,
-  "types": "dist/index.d.ts",
   "ava": {
     "extensions": [
-      "js",
       "ts"
     ],
     "files": [
@@ -54,13 +67,13 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "@blakek/curry": "^2.0.2",
-    "pathington": "^1.1.7"
+    "pathington": "^1.1.7",
+    "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
     "amper-scripts": "^1.2.4",
     "ava": "^3.15.0",
-    "microbundle": "^0.14.1",
+    "bunchee": "^1.7.3",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.4.1",
     "rimraf": "^3.0.2",
@@ -71,13 +84,13 @@
   "scripts": {
     "build": "run-s build:clean build:compile",
     "build:clean": "rimraf ./dist",
-    "build:compile": "microbundle --globals '@blakek/curry=curry'",
+    "build:compile": "bunchee ./src/index.ts",
     "format-check": "amper-scripts format-check .",
     "format": "amper-scripts format-write .",
     "lint": "amper-scripts lint src",
     "prepack": "yarn build",
     "test": "ava",
     "type-check": "tsc --noEmit",
-    "validate": "run-p format-check lint type-check"
+    "validate": "run-p format-check lint test type-check"
   }
 }

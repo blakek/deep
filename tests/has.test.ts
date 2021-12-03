@@ -1,5 +1,5 @@
 import test from 'ava';
-import { has } from '../src';
+import { createHas, has } from '../src';
 
 const fixture: any = {
   '': 42,
@@ -16,16 +16,22 @@ const fixture: any = {
 
 test('returns if the path exists in an object', t => {
   t.is(has('id', fixture), true);
-  t.is(has('id')(fixture), true);
   t.is(has('sites.github', fixture), true);
   t.is(has('sites.github.username', fixture), true);
-  t.is(has('nothing')(fixture), false);
+  t.is(has('nothing', fixture), false);
   t.is(has('deeply.nested.nothing', fixture), false);
-  t.is(has('roles[0]')(fixture), true);
+  t.is(has('roles[0]', fixture), true);
   t.is(has('notDefinedButExists', fixture), true);
   t.is(has('nullish', fixture), true);
 });
 
 test('handles empty-string key', t => {
   t.is(has('', fixture), true);
+});
+
+test('create a reusable has function', t => {
+  const hasUsername = createHas('sites.github.username');
+
+  t.true(hasUsername(fixture));
+  t.false(hasUsername({}));
 });
