@@ -1,10 +1,22 @@
 import {
+  DeepOmit,
   isObject,
   ObjectLike,
   parsePath,
   Path,
   traverseObject
 } from './shared';
+
+export function remove<
+  Object extends ObjectLike,
+  PropertyPath extends Path,
+  Return = DeepOmit<Object, PropertyPath>
+>(path: PropertyPath, object: Object): Return;
+
+export function remove<Return extends unknown>(
+  path: Path,
+  object: ObjectLike
+): Return;
 
 export function remove<T extends ObjectLike>(path: Path, object: T): unknown {
   if (path === undefined) {
@@ -23,8 +35,16 @@ export function remove<T extends ObjectLike>(path: Path, object: T): unknown {
   return object;
 }
 
-export function createRemove<T extends ObjectLike>(
-  path: Path
-): (object: T) => unknown {
-  return (object: T) => remove(path, object);
+export function createRemove<PropertyPath extends Path>(
+  path: PropertyPath
+): <Object extends ObjectLike, Return = DeepOmit<Object, PropertyPath>>(
+  object: Object
+) => Return;
+
+export function createRemove<PropertyPath extends Path>(
+  path: PropertyPath
+): <Return = unknown>(object: ObjectLike) => Return;
+
+export function createRemove(path: Path) {
+  return (object: ObjectLike) => remove(path, object);
 }
